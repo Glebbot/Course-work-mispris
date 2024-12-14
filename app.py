@@ -1,8 +1,8 @@
 from flask import Flask, request
 from database import db_select_query, db_execute_query
-
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/classification', methods=['GET'])
 def get_classification_tree():
