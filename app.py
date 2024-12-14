@@ -7,10 +7,16 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/classification', methods=['GET'])
+@app.route('/classification/tree', methods=['GET'])
 def get_classification_tree():
     classification_tree = db_select_query("select * from show_classification_tree();")
     return classification_tree.model_dump_json(by_alias=True)
+
+
+@app.route('/classification', methods=['GET'])
+def get_classification():
+    classification = db_select_query("select * from classification;")
+    return classification.model_dump_json(by_alias=True)
 
 
 @app.route('/classification', methods=['POST'])
