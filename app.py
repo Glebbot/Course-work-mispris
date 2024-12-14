@@ -22,9 +22,9 @@ def get_classification():
 @app.route('/classification', methods=['POST'])
 def add_classification():
     json_data = request.json
-    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_unit'), json_data.get('parent_class_id'))
-    db_execute_query("select * from add_classification(%s, %s, %s, %s);", params)
-    return json_data
+    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_unit'), json_data.get('id_parent_class'))
+    db_execute_query("select * from add_classification(%s, %s, %s, %s) ;", params)
+    return True
 
 
 @app.route('/classification/<int:id_classification>', methods=['PUT'])
