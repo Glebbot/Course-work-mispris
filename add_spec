@@ -1,0 +1,32 @@
+create function add_spec_product(id_product_input integer, id_position integer, id_part_input integer, quantity integer) returns void
+    language plpgsql
+as
+$$
+DECLARE
+    v_exists BOOLEAN;
+BEGIN
+    -- Проверяем, существует ли цикл
+    SELECT EXISTS (
+        WITH RECURSIVE cte AS (
+            SELECT id_part
+            FROM spec_product
+            WHERE id_product = id_product_input  -- Начинаем с текущего продукта
+            UNION ALL
+            SELECT sp.id_part
+            FROM spec_product sp
+            INNER JOIN cte ON sp.id_product = cte.id_part  -- Рекурсивно соединяем с родителями
+        )
+        SELECT 1
+        FROM cte
+        WHERE id_part = id_part_input  -- Проверяем, есть ли совпадение с новым id_part
+    ) INTO v_exists;
+
+    IF v_exists THEN
+        RAISE EXCEPTION 'Цикл обнаружен: id_part % является родителем для id_product %', id_part_input, id_product_input;
+    ELSE
+        -- Если цикл не найден, выполняем вставку
+        INSERT INTO public.spec_product(id_product, id_position, id_part, quantity)
+        VALUES (id_product_input, id_position, id_part_input, quantity);
+    END IF;
+END;
+$$;
