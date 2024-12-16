@@ -24,7 +24,7 @@ def add_classification():
     json_data = request.json
     params = (json_data['short_name'], json_data['full_name'], json_data.get('id_unit'), json_data.get('id_parent_class'))
     db_execute_query("select * from add_classification(%s, %s, %s, %s) ;", params)
-    return True
+    return '',200
 
 
 @app.route('/classification/<int:id_classification>', methods=['PUT'])
