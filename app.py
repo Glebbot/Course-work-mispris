@@ -101,15 +101,29 @@ def add_spec():
     db_execute_query("select * from add_spec_product(%s, %s, %s, %s);", params)
     return json_data
 
+
 @app.route('/spec', methods=['GET'])
 def get_spec():
     spec_list = db_select_query("SELECT product.full_name AS full_product_name, spec_product.id_product, spec_product.id_part, spec_product.id_position, spec_product.quantity,part_product.full_name AS full_part_name FROM spec_product JOIN product ON spec_product.id_product = product.id_product LEFT JOIN product AS part_product ON spec_product.id_part = part_product.id_product;")
     return spec_list.model_dump_json(by_alias=True)
 
+
 @app.route('/spec/id_products', methods=['GET'])
 def get_id_products():
     spec_list = db_select_query("SELECT distinct id_product FROM spec_product;")
     return spec_list.model_dump_json(by_alias=True)
+
+
+@app.route('/classification/id_classifications', methods=['GET'])
+def get_id_products():
+    class_list = db_select_query("SELECT distinct id_classification FROM classification;")
+    return class_list.model_dump_json(by_alias=True)
+
+
+@app.route('/classification/summary_rates/<int:id_classification>', methods=['GET'])
+def get_classification_tree(id_classification):
+    summary_rates = db_select_query("select * from calculation_summary_rates(%s);", (id_classification,))
+    return summary_rates.model_dump_json(by_alias=True)
 
 
 if __name__ == '__main__':
