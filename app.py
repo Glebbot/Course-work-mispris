@@ -115,13 +115,13 @@ def get_id_products():
 
 
 @app.route('/classification/id_classifications', methods=['GET'])
-def get_id_products():
+def get_id_classification():
     class_list = db_select_query("SELECT distinct id_classification FROM classification;")
     return class_list.model_dump_json(by_alias=True)
 
 
 @app.route('/classification/summary_rates/<int:id_classification>', methods=['GET'])
-def get_classification_tree(id_classification):
+def calculate_summary_rates(id_classification):
     summary_rates = db_select_query("select * from calculation_summary_rates(%s);", (id_classification,))
     return summary_rates.model_dump_json(by_alias=True)
 
