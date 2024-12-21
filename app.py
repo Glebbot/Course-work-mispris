@@ -30,7 +30,7 @@ def add_classification():
 @app.route('/classification/<int:id_classification>', methods=['PUT'])
 def update_classification(id_classification):
     json_data = request.json
-    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_unit'), json_data.get('parent_class_id'), id_classification)
+    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_unit'), json_data.get('id_parent_class'), id_classification)
     db_execute_query(
         "update classification set short_name = %s, full_name = %s, id_unit = %s, id_parent_class = %s where id_classification = %s",
         params)
@@ -58,7 +58,7 @@ def get_products_by_classification(id_classification):
 @app.route('/product', methods=['POST'])
 def add_product():
     json_data = request.json
-    params = (json_data['short_name'], json_data['full_name'], json_data['id_classification'], json_data['price'], json_data.get('id_unit'))
+    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_classification'), json_data.get('price'), json_data.get('id_unit'))
     db_execute_query("select * from add_product(%s, %s, %s, %s, %s);", params)
     return json_data
 
@@ -66,7 +66,7 @@ def add_product():
 @app.route('/product/<int:id_product>', methods=['PUT'])
 def update_product(id_product):
     json_data = request.json
-    params = (json_data['short_name'], json_data['full_name'], json_data['id_classification'], json_data['price'], json_data.get('id_unit'), id_product)
+    params = (json_data['short_name'], json_data['full_name'], json_data.get('id_classification'), json_data.get('price'), json_data.get('id_unit'), id_product)
     db_execute_query(
         "update product set short_name = %s, full_name = %s, id_classification = %s, price = %s, id_unit = %s where id_product = %s",
         params)
@@ -100,6 +100,16 @@ def add_spec():
     params = (json_data['id_product'], json_data['id_position'], json_data['id_part'], json_data['quantity'])
     db_execute_query("select * from add_spec_product(%s, %s, %s, %s);", params)
     return json_data
+
+@app.route('/spec', methods=['GET'])
+def get_spec():
+    spec_list = db_select_query("SELECT product.full_name AS full_product_name, spec_product.id_product, spec_product.id_part, spec_product.id_position, spec_product.quantity,part_product.full_name AS full_part_name FROM spec_product JOIN product ON spec_product.id_product = product.id_product LEFT JOIN product AS part_product ON spec_product.id_part = part_product.id_product;")
+    return spec_list.model_dump_json(by_alias=True)
+
+@app.route('/spec/id_products', methods=['GET'])
+def get_id_products():
+    spec_list = db_select_query("SELECT distinct id_product FROM spec_product;")
+    return spec_list.model_dump_json(by_alias=True)
 
 
 if __name__ == '__main__':
